@@ -27,7 +27,7 @@ function CardForm(): JSX.Element {
     if (error) {
       alert(error.message);
     } else if (token) {
-      window.location.href = `ecolife://loadingcardtoken/${token.id}`;
+      window.location.href = `ecolife://orders/${token.id}`;
     }
   };
 
