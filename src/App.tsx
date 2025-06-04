@@ -1,4 +1,4 @@
-import { useEffect, useRef, FormEvent, type JSX } from "react";
+import { useRef, type FormEvent, type JSX } from "react";
 import { loadStripe } from "@stripe/stripe-js";
 import {
   CardElement,
