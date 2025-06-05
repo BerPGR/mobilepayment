@@ -6,6 +6,7 @@ import {
   useStripe,
   useElements,
 } from "@stripe/react-stripe-js";
+import { useSearchParams } from "react-router-dom";
 
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_KEY); // substitua pela sua public key
 
@@ -13,6 +14,13 @@ function CardForm(): JSX.Element {
   const stripe = useStripe();
   const elements = useElements();
   const formRef = useRef<HTMLFormElement>(null);
+  const [searchElements] = useSearchParams();
+
+  const token = searchElements.get('token')
+  const payment_method = searchElements.get('payment_method')
+  const amount = searchElements.get('amount')
+  const property_id = searchElements.get('property_id')
+  const quantity = searchElements.get('quantity')
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -37,6 +45,15 @@ function CardForm(): JSX.Element {
         <h2 className="text-2xl font-semibold mb-4 text-center">
           Pagamento com Cartão
         </h2>
+        <div>
+          <ul>
+            <li>{token}</li>
+            <li>{payment_method}</li>
+            <li>{amount}</li>
+            <li>{property_id}</li>
+            <li>{quantity}</li>
+          </ul>
+        </div>
         <form ref={formRef} onSubmit={handleSubmit} className="space-y-6">
           <div className="p-4 border rounded-lg">
             <CardElement options={{ style: { base: { fontSize: "16px" } } }} />
