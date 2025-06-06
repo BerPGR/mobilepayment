@@ -7,7 +7,6 @@ import {
   useElements,
 } from "@stripe/react-stripe-js";
 import { useSearchParams } from "react-router-dom";
-
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_KEY); // substitua pela sua public key
 
 function CardForm(): JSX.Element {
@@ -16,7 +15,7 @@ function CardForm(): JSX.Element {
   const formRef = useRef<HTMLFormElement>(null);
   const [searchElements] = useSearchParams();
 
-  const token = searchElements.get('token')
+  const bearerToken = searchElements.get('token')
   const payment_method = searchElements.get('payment_method')
   const amount = searchElements.get('amount')
   const property_id = searchElements.get('property_id')
@@ -35,7 +34,29 @@ function CardForm(): JSX.Element {
     if (error) {
       alert(error.message);
     } else if (token) {
-      window.location.href = `ecolife://orders/${token.id}`;
+      const data = await fetch("https://homologacao.ecolifemeioambiente.com.br/api/V2/payment/create", {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${bearerToken}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          amount,
+          payment_method,
+          token: token.id,
+          property_id,
+          quantity
+        })
+      })
+
+      const result = await data.json();
+
+      if (result?.status === true){
+        window.location.href = `ecolife://orders/${token.id}`;
+      }
+      else {
+        alert(result?.payment_status)
+      }
     }
   };
 
@@ -47,11 +68,8 @@ function CardForm(): JSX.Element {
         </h2>
         <div>
           <ul>
-            <li>{token}</li>
-            <li>{payment_method}</li>
-            <li>{amount}</li>
-            <li>{property_id}</li>
-            <li>{quantity}</li>
+            <li>R${amount}</li>
+            <li>{quantity} Créditos de Carbono</li>
           </ul>
         </div>
         <form ref={formRef} onSubmit={handleSubmit} className="space-y-6">
