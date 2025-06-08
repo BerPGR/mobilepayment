@@ -7,6 +7,7 @@ import {
   useElements,
 } from "@stripe/react-stripe-js";
 import { useSearchParams } from "react-router-dom";
+import axios from "axios";
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_KEY); // substitua pela sua public key
 
 function CardForm(): JSX.Element {
@@ -15,11 +16,11 @@ function CardForm(): JSX.Element {
   const formRef = useRef<HTMLFormElement>(null);
   const [searchElements] = useSearchParams();
 
-  const bearerToken = searchElements.get('token')
-  const payment_method = searchElements.get('payment_method')
-  const amount = searchElements.get('amount')
-  const property_id = searchElements.get('property_id')
-  const quantity = searchElements.get('quantity')
+  const bearerToken = searchElements.get("token");
+  const payment_method = searchElements.get("payment_method");
+  const amount = searchElements.get("amount");
+  const property_id = searchElements.get("property_id");
+  const quantity = searchElements.get("quantity");
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -34,29 +35,51 @@ function CardForm(): JSX.Element {
     if (error) {
       alert(error.message);
     } else if (token) {
-      const data = await fetch("https://homologacao.ecolifemeioambiente.com.br/api/V2/payment/create", {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${bearerToken}`,
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          amount,
-          payment_method,
-          token: token.id,
-          property_id,
-          quantity
-        })
-      })
+      try {
+        const response = await axios.post(
+          "http://localhost:8000/api/V2/payment/create",
+          {
+            amount,
+            payment_method,
+            token: token.id,
+            property_id,
+            quantity,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${bearerToken}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
 
-      const result = await data.json();
+        const result = response.data;
 
-      if (result?.status === true){
-        window.location.href = `ecolife://orders/${token.id}`;
+        console.log('====================================');
+        console.log(result);
+        console.log('====================================');
+        if (result?.success === true) {
+          window.location.href = `ecolife://orders/${token.id}`;
+        } else {
+          alert(result?.payment_status || "Erro ao processar o pagamento.");
+        }
+      } catch (error: any) {
+        console.error("Erro ao enviar requisição:", error);
+        alert("Erro ao enviar pagamento. Verifique o console.");
       }
-      else {
-        alert(result?.payment_status)
-      }
+      //try {
+      //  const result = JSON.parse(text)
+      //  console.log('====================================');
+      //  console.log(result);
+      //  console.log('====================================');
+      //  if (result?.success === true) {
+      //    window.location.href = `ecolife://orders/${token.id}`;
+      //  } else {
+      //    alert(result?.payment_status);
+      //  }
+      //} catch (e) {
+      //  alert(e);
+      //}
     }
   };
 
