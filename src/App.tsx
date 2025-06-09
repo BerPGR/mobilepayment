@@ -37,7 +37,7 @@ function CardForm(): JSX.Element {
     } else if (token) {
       try {
         const response = await axios.post(
-          "http://localhost:8000/api/V2/payment/create",
+          "https://homologacao.ecolifemeioambiente.com.br/api/V2/payment/create",
           {
             amount,
             payment_method,
@@ -55,9 +55,6 @@ function CardForm(): JSX.Element {
 
         const result = response.data;
 
-        console.log('====================================');
-        console.log(result);
-        console.log('====================================');
         if (result?.success === true) {
           window.location.href = `ecolife://orders/${token.id}`;
         } else {
