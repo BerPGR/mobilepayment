@@ -58,7 +58,7 @@ function CardForm(): JSX.Element {
         console.log(result);
         console.log('====================================');
 
-        if (result?.success === true) {
+        if (result?.payment_status === "succeeded") {
           window.location.href = `ecolife://orders/${token.id}`;
         } else {
           alert(result?.payment_status || "Erro ao processar o pagamento.");
