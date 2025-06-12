@@ -18,7 +18,7 @@ function CardForm(): JSX.Element {
 
   const bearerToken = searchElements.get("token");
   const payment_method = searchElements.get("payment_method");
-  const amount = searchElements.get("amount");
+  const amount = Number(searchElements.get("amount")).toFixed(2);
   const property_id = searchElements.get("property_id");
   const quantity = searchElements.get("quantity");
 
@@ -54,6 +54,9 @@ function CardForm(): JSX.Element {
         );
 
         const result = response.data;
+        console.log('====================================');
+        console.log(result);
+        console.log('====================================');
 
         if (result?.success === true) {
           window.location.href = `ecolife://orders/${token.id}`;
@@ -89,7 +92,7 @@ function CardForm(): JSX.Element {
         <div>
           <ul>
             <li>R${amount}</li>
-            <li>{quantity} Créditos de Carbono</li>
+            <li>Créditos de Carbono para compra - {quantity}</li>
           </ul>
         </div>
         <form ref={formRef} onSubmit={handleSubmit} className="space-y-6">
